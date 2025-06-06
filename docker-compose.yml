@@ -1,0 +1,17 @@
+version: "3.8"
+services:
+  modidock:
+    build: .
+    container_name: modidock
+    ports:
+      - "7000:7000"
+    environment:
+      - NODE_ENV=production
+      # - PORT=7000   # (Optional, only if you want to force)
+    volumes:
+      # Mount your Docker compose folder (adjust as needed)
+      - /opt/docker/compose:/compose:rw
+      # Mount your ControlD config (adjust as needed)
+      - /opt/docker/volumes/controld:/volumes/controld:rw
+      # Mount Docker socket for optional restart support
+      - /var/run/docker.soc
