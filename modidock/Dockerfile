@@ -1,31 +1,29 @@
-# ─── Build Stage for Frontend ────────────────────────────────────────────────
-FROM node:18-alpine AS frontend-build
-WORKDIR /usr/src/app/frontend
+# Dockerfile
 
-COPY frontend/package.json frontend/package-lock.json* ./
-RUN npm install
+# Use a base image with Node.js and a full OS so we can install MongoDB
+FROM node:18
 
-COPY frontend/ ./
-RUN npm run build
-# Output → /usr/src/app/frontend/build
+# Update package lists and install MongoDB and Supervisor
+RUN apt-get update && apt-get install -y \
+    mongodb \
+    supervisor \
+    && rm -rf /var/lib/apt/lists/*
 
-# ─── Final Stage: Backend + Serve Frontend ───────────────────────────────────
-FROM node:18-alpine
+# Create a directory for our app
 WORKDIR /usr/src/app
 
-# 1. Install backend dependencies
-COPY backend/package.json backend/package-lock.json* ./
-RUN npm install --production
+# Copy the package.json and install dependencies
+COPY package*.json ./
+RUN npm install
 
-# 2. Copy backend source
-COPY backend/ ./backend
+# Copy the rest of the application code
+COPY . .
 
-# 3. Copy built frontend from stage 1
-COPY --from=frontend-build /usr/src/app/frontend/build ./backend/public
+# Copy the supervisor configuration file
+COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
-# 4. Create config directory (populated via Docker Compose)
-RUN mkdir -p /app/config
+# Expose the new port
+EXPOSE 7000
 
-EXPOSE 8080
-ENV VOLUME_ROOT=/volumes
-CMD ["node", "backend/server.js"]
+# The command to start Supervisor, which in turn starts MongoDB and our Node app
+CMD ["/usr/bin/supervisord"]
