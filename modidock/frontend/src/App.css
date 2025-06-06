@@ -1,0 +1,6 @@
+body { margin: 0; font-family: Arial,sans-serif; }
+.tilebar { width: 220px; background: #f3f3f3; padding: 1rem; height: 100vh; box-sizing: border-box; overflow-y: auto; }
+.tile { background: #fff; border: 1px solid #eee; border-radius: 8px; padding: 1rem; margin-bottom: 1rem; cursor: pointer; display: flex; align-items: center; }
+.tile .icon { font-size: 2rem; margin-right: 0.7rem; }
+.tile:hover { background: #e0e7ff; }
+.editorpane { flex: 1; padding: 2rem; background: #fafaff; }
